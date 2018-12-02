@@ -275,7 +275,7 @@ class Matrix:
                 det += (-1)**j * self.get_entry(0, j) * self.matrix_sub_two(0, j).determinant()
             return det
 
-    def inverse2(self):
+    def inverse_size_2(self):
         """
         Returns a matrix equal to the inverse of self if self is 2x2 and invertible
         """
