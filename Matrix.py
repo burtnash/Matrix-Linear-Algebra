@@ -150,7 +150,27 @@ class Matrix:
                     return False
         return True
 
-    def equal_size(self, other: "Matrix") -> bool:
+    def is_invertible(self) -> bool:
+        """
+        Returns true iff sef is invertible.
+        :return: Whether or not self is invertible.
+        """
+        if not self.is_square():
+            return False
+        return self.determinant() != 0
+
+    def is_diagonal(self) -> bool:
+        """
+        Returns true if self is a diagonal matrix
+        :return: Whether self is diagonal
+        """
+        for i in range(self.m):
+            for j in range(self.n):
+                if i != j and self.get_entry(i, j) != 0:
+                    return False
+        return True
+
+    def is_equal_size(self, other: "Matrix") -> bool:
         """
         Returns true if self and other have equal size
         :param other: The matrix being compared to self
@@ -173,7 +193,7 @@ class Matrix:
         :param other: The second matrix being added.
         :return: A new matrix equal to the sum of self and other.
         """
-        if not self.equal_size(other):
+        if not self.is_equal_size(other):
             raise Exception
         a = Matrix(self.m, self.n)
         for i in range(self.m):
@@ -412,15 +432,6 @@ class Matrix:
                 det += (-1) ** j * self.get_entry(0, j) * self.matrix_sub_two(0, j).determinant()
             return det
 
-    def invertible(self) -> bool:
-        """
-        Returns true iff sef is invertible.
-        :return: Whether or not self is invertible.
-        """
-        if not self.is_square():
-            return False
-        return self.determinant() != 0
-
     def inverse_size_2(self) -> "Matrix":
         """
         Returns a matrix equal to the inverse of self if self is 2x2 and invertible.
@@ -429,7 +440,7 @@ class Matrix:
         """
         if self.n != 2 or self.m != 2:
             raise Exception("Not 2x2")
-        elif not self.invertible():
+        elif not self.is_invertible():
             raise Exception("Not invertible")
         temp_matrix = self.copy()
         temp_matrix.set_entry(0, 0, self.get_entry(1, 1))
@@ -446,7 +457,7 @@ class Matrix:
         Precondition: Self is invertible.
         :return: The matrix equal to the inverse of self.
         """
-        if not self.invertible():
+        if not self.is_invertible():
             raise Exception
         size = self.m
         temp_matrix = Matrix(size, 2 * size)
