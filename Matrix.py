@@ -39,12 +39,11 @@ class Matrix:
             return False
         if self.m != other.m or self.n != other.n:
             return False
-        ret = True
         for i in range(self.m):
             for j in range(self.n):
                 if self.get_entry(i, j) != other.get_entry(i, j):
-                    ret = False
-        return ret
+                    return False
+        return True
 
     def set_entry(self, row: int, col: int, value: int) -> None:
         """
@@ -56,7 +55,6 @@ class Matrix:
         """
         Returns the value at row i and col j.
         """
-
         return self.board[i][j]
 
     def set_board(self, board) -> None:
@@ -209,11 +207,20 @@ class Matrix:
                 current_row += 1
                 current_col += 1
 
-
+    def transpose(self):
+        """
+        Returns the transpose of self
+        :return: The transpose of self
+        """
+        temp_matrix = Matrix(self.n, self.m)
+        for i in range(self.m):
+            for j in range(self.n):
+                temp_matrix.set_entry(j, i, self.get_entry(i, j))
+        return temp_matrix
 
     def multiply(self, other):
         """
-        Multiples self and other together.
+        Returns the product of self and other together.
         """
 
         if self.n != other.m:

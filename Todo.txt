@@ -1,0 +1,4 @@
+Features to add:
+
+Diagonalization
+Eigenvectors and eigenvalues
