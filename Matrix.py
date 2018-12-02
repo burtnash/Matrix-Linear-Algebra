@@ -89,6 +89,18 @@ class Matrix:
         """
         return self.m == self.n
 
+    @staticmethod
+    def get_i_matrix(size: int):
+        """
+        Returns the matrix I that is size x size.
+        """
+        i_matrix = Matrix(size, size)
+        for i in range(size):
+            for j in range(size):
+                if i == j:
+                    i_matrix.set_entry(i, j, 1)
+        return i_matrix
+
     def is_zero_matrix(self) -> bool:
         """
         Returns true iff self is the zero matrix.
@@ -143,6 +155,20 @@ class Matrix:
         for i in range(len(self.board[row1])):
             self.board[row1][i] += temp_row[i]
 
+    def get_leading_ones(self):
+        """
+        Returns a list of the coordinated of all the leading ones
+        Precondition: self is in ref
+        :return: List of leading one coordinates in the form (row, col)
+        """
+        leading_ones = []
+        for i in range(self.m):
+            for j in range(self.n):
+                if self.board[i][j] == 1:
+                    leading_ones.append((i, j))
+                    break
+        return leading_ones
+
     def in_row_echelon_form(self) -> bool:
         """
         Returns true iff self is in row echelon form
@@ -181,6 +207,20 @@ class Matrix:
 
         return True
 
+    def in_reduced_ref(self) -> bool:
+        """
+        Return true if self is in reduced row echelon form
+        :return: whether or not self is in reduced REF
+        """
+        if not self.in_row_echelon_form():
+            return False
+        leading_ones = self.get_leading_ones()
+        for leader in leading_ones:
+            for i in range(leader[0]):
+                if self.get_entry(i, leader[1]) != 0:
+                    return False
+        return True
+
     def row_reduce(self) -> None:
         """
         Row reduces self by gaussian elimination.
@@ -206,6 +246,19 @@ class Matrix:
                         self.add_scaled_row(i, current_row, -entry)
                 current_row += 1
                 current_col += 1
+
+    def reduce_ref(self) -> None:
+        """
+        Row reduces self to RREF.
+        Precondition: self is in ref
+        """
+        leading_ones = self.get_leading_ones()
+        leading_ones.reverse()
+        for leader in leading_ones:
+            for i in range(leader[0]-1, -1, -1):
+                entry = self.get_entry(i, leader[1])
+                if entry != 0:
+                    self.add_scaled_row(i, leader[0], -entry)
 
     def transpose(self):
         """
@@ -241,12 +294,14 @@ class Matrix:
         """
         Returns matrix equivalent to self multiplied by itself exponent times
         """
-        if exponent < 1:
+        if exponent < 0:
             raise Exception("Invalid exponent")
         elif exponent == 1:
             return self.copy()
-        elif self.m != self.n:
+        elif not self.is_square():
             raise Exception("Cannot be raised to power")
+        elif exponent == 0:
+            return Matrix.get_i_matrix(self.m)
         temp_matrix = self.copy()
         temp_matrix2 = self.copy()
         for _ in range(exponent-1):
@@ -274,6 +329,16 @@ class Matrix:
             for j in range(size):
                 det += (-1)**j * self.get_entry(0, j) * self.matrix_sub_two(0, j).determinant()
             return det
+
+
+
+    def invertible(self) -> bool:
+        """
+        Returns true iff sef is invertible.
+        """
+        if not self.is_square():
+            return False
+        return self.determinant() != 0
 
     def inverse_size_2(self):
         """
@@ -309,26 +374,6 @@ class Matrix:
                     else:
                         new_matrix.set_entry(i-passed_row, j-passed_col, self.get_entry(i, j))
         return new_matrix
-
-    @staticmethod
-    def get_i_matrix(size: int):
-        """
-        Returns the matrix I that is size x size.
-        """
-        i_matrix = Matrix(size, size)
-        for i in range(size):
-            for j in range(size):
-                if i == j:
-                    i_matrix.set_entry(i, j, 1)
-        return i_matrix
-
-    def invertible(self) -> bool:
-        """
-        Returns true iff sef is invertible.
-        """
-        if not self.is_square():
-            return False
-        return self.determinant() != 0
 
     def is_eigenvalue(self, eigenvalue: int) -> bool:
         """
