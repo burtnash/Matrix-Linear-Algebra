@@ -1,13 +1,15 @@
-"""Linear Algebra Helper"""
+"""Linear Algebra Matrix"""
+
+from typing import Union, List, Tuple
 
 
 class Matrix:
     """
     A Matrix ala Liner Algebra.
 
-    m: Number of rows
-    n: Number of columns
-    board: All matrix values
+    m: Number of rows.
+    n: Number of columns.
+    board: All matrix values.
     """
 
     def __init__(self, m: int, n: int) -> None:
@@ -16,27 +18,33 @@ class Matrix:
         self.board = []
         for i in range(m):
             self.board.append([])
-            for j in range(n):
+            for _ in range(n):
                 self.board[i].append(0)
 
     def __str__(self) -> str:
         """
         Returns a string representation of self.
+        :return: String representation of self.
         """
 
         string = ""
         for i in range(self.m):
+            string += "|"
             for j in range(self.n):
                 string += str(self.board[i][j]) + " "
-            string += "\n"
+            string = string[:len(string) - 1]
+            string += "| \n"
         return string
 
-    def __eq__(self, other):
+    def __eq__(self, other: object) -> bool:
         """
         Returns whether or not self and other are equal.
+        :param other: The object being compared to self.
+        :return: Whether or not self and other are equal.
         """
         if type(self) != type(other):
             return False
+        other: Matrix
         if self.m != other.m or self.n != other.n:
             return False
         for i in range(self.m):
@@ -48,24 +56,31 @@ class Matrix:
     def set_entry(self, row: int, col: int, value: int) -> None:
         """
         Sets the entry and row row and column col to value.
+        :param row: The row of the value being set.
+        :param col: The column of the value being set.
+        :param value: The new value.
         """
         self.board[row][col] = value
 
-    def get_entry(self, i: int, j: int) -> int:
+    def get_entry(self, row: int, col: int) -> Union[int, float]:
         """
         Returns the value at row i and col j.
+        :param row: The row of the value being retrieved.
+        :param col: The column of the value being retrieved.
         """
-        return self.board[i][j]
+        return self.board[row][col]
 
-    def set_board(self, board) -> None:
+    def set_board(self, board: List[List[Union[int, float]]]) -> None:
         """
-        Sets the board.
+        Sets the board to board, where the lists of board are the rows of the matrix.
+        :param board: A list of list of values to be the new board.
         """
         self.board = board
 
-    def copy(self):
+    def copy(self) -> "Matrix":
         """
-        Returns a copy of self.
+        Returns a shallow copy of self.
+        :return: A copy of self.
         """
         temp_matrix = Matrix(self.m, self.n)
         for i in range(self.m):
@@ -73,26 +88,35 @@ class Matrix:
                 temp_matrix.set_entry(i, j, self.get_entry(i, j))
         return temp_matrix
 
-    @staticmethod
-    def is_zero_row(row):
+    def round(self, digits: int) -> "Matrix":
         """
-        Returns two iff row is all zeroes
+        Returns self with all entries rounded to digits decimal places.
+        :param digits: The number of decimal places rounded to.
+        :return: Matrix equivalent to self with each entry rounded.
+        """
+        temp_matrix = Matrix(self.m, self.n)
+        for i in range(self.m):
+            for j in range(self.n):
+                temp_matrix.set_entry(i, j, round(self.get_entry(i, j), digits))
+        return temp_matrix
+
+    @staticmethod
+    def is_zero_row(row: List[Union[int, float]]) -> bool:
+        """
+        Returns true if row contains only 0's.
+        :return: Whether or not row is a zero row.
         """
         for item in row:
             if item != 0:
                 return False
         return True
 
-    def is_square(self) -> bool:
-        """
-        Returns true iff self is a square matrix
-        """
-        return self.m == self.n
-
     @staticmethod
-    def get_i_matrix(size: int):
+    def get_i_matrix(size: int) -> "Matrix":
         """
-        Returns the matrix I that is size x size.
+        Returns the matrix I that is size: size x size.
+        :param size: The size of the I matrix being returned.
+        :return: The I matrix that is size x size.
         """
         i_matrix = Matrix(size, size)
         for i in range(size):
@@ -101,9 +125,24 @@ class Matrix:
                     i_matrix.set_entry(i, j, 1)
         return i_matrix
 
+    def is_square(self) -> bool:
+        """
+        Returns true iff self is a square matrix.
+        :return: Whether or not self is square.
+        """
+        return self.m == self.n
+
+    def is_vector(self) -> bool:
+        """
+        Returns true if self is a vector.
+        :return: Whether or not self is a vector
+        """
+        return self.n == 1
+
     def is_zero_matrix(self) -> bool:
         """
         Returns true iff self is the zero matrix.
+        :return: Whether or not self is a vector.
         """
         for i in range(self.m):
             for j in range(self.n):
@@ -111,20 +150,30 @@ class Matrix:
                     return False
         return True
 
-    def scale(self, scalar: float):
+    def equal_size(self, other: "Matrix") -> bool:
+        """
+        Returns true if self and other have equal size
+        :param other: The matrix being compared to self
+        :return: Whether or not self and other have equal size
+        """
+        return self.m == other.m and self.n == other.n
+
+    def scale(self, scalar: float) -> None:
         """
         Scales self by scalar.
+        :param scalar: The amount that self is being scaled by.
         """
-
         for i in range(self.m):
             for j in range(self.n):
                 self.board[i][j] *= scalar
 
-    def add_matrix(self, other: "Matrix"):
+    def add_matrix(self, other: "Matrix") -> "Matrix":
         """
         Returns matrix equivalent to self + other
+        :param other: The second matrix being added.
+        :return: A new matrix equal to the sum of self and other.
         """
-        if self.m != other.m or self.n != other.n:
+        if not self.equal_size(other):
             raise Exception
         a = Matrix(self.m, self.n)
         for i in range(self.m):
@@ -132,34 +181,41 @@ class Matrix:
                 a.set_entry(i, j, self.get_entry(i, j) + other.get_entry(i, j))
         return a
 
-    def swap_rows(self, row_1: int, row_2: int):
+    def swap_rows(self, row_1: int, row_2: int) -> None:
         """
-        Swaps row_1 and row_2
+        Swaps row_1 and row_2.
+        :param row_1: The first row being swaped.
+        :param row_2: The second row being swaped.
         """
         self.board[row_1], self.board[row_2] = self.board[row_2], self.board[row_1]
 
-    def scale_row(self, row: int, scalar: float):
+    def scale_row(self, row: int, scalar: float) -> None:
         """
-        Scales row by scalar
+        Scales row by scalar.
+        :param row: The row being scaled.
+        :param scalar: The amount it is being scaled by.
         """
         for i in range(self.n):
             self.board[row][i] *= scalar
 
-    def add_scaled_row(self, row1: int, row2: int, scalar: float):
+    def add_scaled_row(self, base_row: int, adder_row: int, scalar: float) -> None:
         """
-        Adds row2's values to row1 where each value is scaled by scalar
+        Adds row2's values to row1 where each value is scaled by scalar.
+        :param base_row: The row being added onto.
+        :param adder_row: The row being scaled and added to base_row.
+        :param scalar: The amount that adder_row is scaled by.
         """
         temp_row = []
-        for num in self.board[row2]:
+        for num in self.board[adder_row]:
             temp_row.append(num * scalar)
-        for i in range(len(self.board[row1])):
-            self.board[row1][i] += temp_row[i]
+        for i in range(len(self.board[base_row])):
+            self.board[base_row][i] += temp_row[i]
 
-    def get_leading_ones(self):
+    def get_leading_ones(self) -> List[Tuple[int, int]]:
         """
-        Returns a list of the coordinated of all the leading ones
-        Precondition: self is in ref
-        :return: List of leading one coordinates in the form (row, col)
+        Returns a list of the coordinated of all the leading ones.
+        Precondition: self is in ref.
+        :return: List of leading one coordinates in the form (row, col).
         """
         leading_ones = []
         for i in range(self.m):
@@ -171,10 +227,11 @@ class Matrix:
 
     def in_row_echelon_form(self) -> bool:
         """
-        Returns true iff self is in row echelon form
+        Returns true iff self is in row echelon form.
+        :return: Whether or not self is in REF.
         """
         leading_ones = []
-        # Test 1: Are all first entries leading ones
+        # Test 1: Are all first entries leading ones.
         for i in range(self.m):
             for j in range(self.n):
                 if self.board[i][j] == 1:
@@ -183,34 +240,33 @@ class Matrix:
                 elif self.board[i][j] != 0:
                     return False
 
-        # Test 2: Are all entries below leading 1's zeroes
+        # Test 2: Are all entries below leading 1's zeroes.
         for leader in leading_ones:
             row = leader[0]
             col = leader[1]
-            for i in range(row+1, self.m):
+            for i in range(row + 1, self.m):
                 if self.board[i][col] != 0:
                     return False
 
-        # Test 3: All leading ones in rows lower down are to the right
+        # Test 3: All leading ones in rows lower down are to the right.
         for i in range(1, len(leading_ones)):
-            if leading_ones[i][1] <= leading_ones[i-1][1]:
+            if leading_ones[i][1] <= leading_ones[i - 1][1]:
                 return False
 
-        # Test 4: All zero rows are at the bottom
+        # Test 4: All zero rows are at the bottom.
         zero_row_found = False
         for item in self.board:
             if Matrix.is_zero_row(item):
                 zero_row_found = True
-            if zero_row_found:
+            elif zero_row_found:
                 if not Matrix.is_zero_row(item):
                     return False
-
         return True
 
     def in_reduced_ref(self) -> bool:
         """
-        Return true if self is in reduced row echelon form
-        :return: whether or not self is in reduced REF
+        Return true if self is in reduced row echelon form.
+        :return: Whether or not self is in reduced REF.
         """
         if not self.in_row_echelon_form():
             return False
@@ -240,6 +296,7 @@ class Matrix:
                 current_col += 1
             else:
                 self.swap_rows(current_row, leading_one_row)
+                self.scale_row(current_row, 1/self.get_entry(current_row, current_col))
                 for i in range(current_row + 1, self.m):
                     entry = self.get_entry(i, current_col)
                     if entry != 0:
@@ -247,23 +304,23 @@ class Matrix:
                 current_row += 1
                 current_col += 1
 
-    def reduce_ref(self) -> None:
+    def reduced_row_reduce(self) -> None:
         """
         Row reduces self to RREF.
-        Precondition: self is in ref
+        Precondition: self is in ref.
         """
         leading_ones = self.get_leading_ones()
         leading_ones.reverse()
         for leader in leading_ones:
-            for i in range(leader[0]-1, -1, -1):
+            for i in range(leader[0] - 1, -1, -1):
                 entry = self.get_entry(i, leader[1])
                 if entry != 0:
                     self.add_scaled_row(i, leader[0], -entry)
 
-    def transpose(self):
+    def transpose(self) -> "Matrix":
         """
-        Returns the transpose of self
-        :return: The transpose of self
+        Returns the transpose of self.
+        :return: The transpose of self.
         """
         temp_matrix = Matrix(self.n, self.m)
         for i in range(self.m):
@@ -271,9 +328,11 @@ class Matrix:
                 temp_matrix.set_entry(j, i, self.get_entry(i, j))
         return temp_matrix
 
-    def multiply(self, other):
+    def multiply(self, other: "Matrix") -> "Matrix":
         """
         Returns the product of self and other together.
+        :param other: The right matrix being multiplied.
+        :return: The matrix equal to the product of self and other.
         """
 
         if self.n != other.m:
@@ -290,9 +349,11 @@ class Matrix:
                 temp_matrix.set_entry(i, j, num)
         return temp_matrix
 
-    def power(self, exponent: int):
+    def power(self, exponent: int) -> "Matrix":
         """
-        Returns matrix equivalent to self multiplied by itself exponent times
+        Returns matrix equivalent to self multiplied by itself exponent times.
+        :param exponent: The exponent that self is raised to.
+        :return: The matrix equal to self multiplied by itself exponent-1 times.
         """
         if exponent < 0:
             raise Exception("Invalid exponent")
@@ -304,15 +365,36 @@ class Matrix:
             return Matrix.get_i_matrix(self.m)
         temp_matrix = self.copy()
         temp_matrix2 = self.copy()
-        for _ in range(exponent-1):
+        for _ in range(exponent - 1):
             temp_matrix2 = temp_matrix.multiply(temp_matrix2)
         return temp_matrix2
 
+    def matrix_sub_two(self, row: int, col: int) -> "Matrix":
+        """
+        Returns the matrix minus row row and column column.
+        :param row: Row to be removed.
+        :param col: Column to be removed.
+        :return: The matrix equal to self without row row and column col.
+        """
+        passed_row = 0
+        new_matrix = Matrix(self.m - 1, self.n - 1)
+        for i in range(len(self.board)):
+            passed_col = 0
+            if i == row:
+                passed_row = 1
+            else:
+                for j in range(len(self.board)):
+                    if j == col:
+                        passed_col = 1
+                    else:
+                        new_matrix.set_entry(i - passed_row, j - passed_col, self.get_entry(i, j))
+        return new_matrix
+
     def determinant(self) -> float:
         """
-        Returns the determinant of a 2x2 matrix
+        Returns the determinant of self.
+        :return: The determinant of self.
         """
-
         if not self.is_square():
             raise Exception("Matrix is not square")
         size = self.m
@@ -323,61 +405,72 @@ class Matrix:
             b = self.get_entry(0, 1)
             c = self.get_entry(1, 0)
             d = self.get_entry(1, 1)
-            return a*d - b*c
+            return a * d - b * c
         else:
             det = 0
             for j in range(size):
-                det += (-1)**j * self.get_entry(0, j) * self.matrix_sub_two(0, j).determinant()
+                det += (-1) ** j * self.get_entry(0, j) * self.matrix_sub_two(0, j).determinant()
             return det
-
-
 
     def invertible(self) -> bool:
         """
         Returns true iff sef is invertible.
+        :return: Whether or not self is invertible.
         """
         if not self.is_square():
             return False
         return self.determinant() != 0
 
-    def inverse_size_2(self):
+    def inverse_size_2(self) -> "Matrix":
         """
-        Returns a matrix equal to the inverse of self if self is 2x2 and invertible
+        Returns a matrix equal to the inverse of self if self is 2x2 and invertible.
+        Precondition: Self is 2x2 and invertible.
+        :return: A 2x2 matrix equal to the inverse of self.
         """
         if self.n != 2 or self.m != 2:
             raise Exception("Not 2x2")
-        elif self.determinant() == 0:
+        elif not self.invertible():
             raise Exception("Not invertible")
         temp_matrix = self.copy()
-        temp_matrix.board[0][0] = self.board[1][1]
+        temp_matrix.set_entry(0, 0, self.get_entry(1, 1))
         temp_matrix.board[0][1] *= -1
         temp_matrix.board[1][0] *= -1
-        temp_matrix.board[1][1] = self.board[0][0]
+        temp_matrix.set_entry(1, 1, self.get_entry(0, 0))
         scalar = 1 / temp_matrix.determinant()
         temp_matrix.scale(scalar)
         return temp_matrix
 
-    def matrix_sub_two(self, row: int, column: int):
+    def inverse(self) -> "Matrix":
         """
-        Returns the matrix minus row row and column column.
+        Returns the inverse of self.
+        Precondition: Self is invertible.
+        :return: The matrix equal to the inverse of self.
         """
-        passed_row = 0
-        new_matrix = Matrix(self.m-1, self.n-1)
-        for i in range(len(self.board)):
-            passed_col = 0
-            if i == row:
-                passed_row = 1
-            else:
-                for j in range(len(self.board)):
-                    if j == column:
-                        passed_col = 1
-                    else:
-                        new_matrix.set_entry(i-passed_row, j-passed_col, self.get_entry(i, j))
-        return new_matrix
+        if not self.invertible():
+            raise Exception
+        size = self.m
+        temp_matrix = Matrix(size, 2 * size)
+        i_matrix = Matrix.get_i_matrix(size)
+        for i in range(self.m):
+            for j in range(self.n):
+                temp_matrix.set_entry(i, j, self.get_entry(i, j))
+        for i in range(self.m):
+            for j in range(self.n):
+                temp_matrix.set_entry(i, j + size, i_matrix.get_entry(i, j))
+        temp_matrix.row_reduce()
+        temp_matrix.reduced_row_reduce()
+        temp_matrix_2 = Matrix(size, size)
+        for i in range(self.m):
+            for j in range(self.n):
+                temp_matrix_2.set_entry(i, j, temp_matrix.get_entry(i, j - size))
+        temp_matrix_3 = temp_matrix_2.round(3)
+        return temp_matrix_3
 
     def is_eigenvalue(self, eigenvalue: int) -> bool:
         """
-        Returns true iff eigenvalue is an eigenvalue for self.
+        Returns true if eigenvalue is an eigenvalue for self.
+        :param eigenvalue: Value being checked.
+        :return: Whether or not eigenvalue is an eigenvalue for self.
         """
         if not self.is_square():
             raise Exception
