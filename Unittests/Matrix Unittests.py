@@ -8,6 +8,35 @@ from Matrix import Matrix
 
 class TestMatrix(unittest.TestCase):
 
+    # Various Simple Tests
+    def test_string(self):
+        m = Matrix(2, 2)
+        m.set_board([[1, 2], [3, 4]])
+        n = "|1 2|\n|3 4|"
+        self.assertEqual(n, m.__str__())
+
+    def test_equals(self):
+        m = Matrix(2, 2)
+        m.set_board([[1, 2], [3, 4]])
+        n = Matrix(2, 2)
+        n.set_board([[1, 2], [3, 4]])
+        self.assertEqual(m, n)
+
+    def test_copy(self):
+        m = Matrix(2, 2)
+        m.set_board([[1, 2], [3, 4]])
+        n = m.copy()
+        self.assertEqual(m, n)
+        self.assertFalse(m is n)
+
+    def test_i_matrix_size3(self):
+        m = Matrix.get_i_matrix(3)
+        n = Matrix(3, 3)
+        n.set_entry(0, 0, 1)
+        n.set_entry(1, 1, 1)
+        n.set_entry(2, 2, 1)
+        self.assertEqual(m, n)
+
     # In Row Echelon Form tests
     def test_is_ref(self):
         m = Matrix(3, 3)

@@ -1,6 +1,7 @@
 """Linear Algebra Matrix"""
 
 from typing import Union, List, Tuple
+from random import randint
 
 
 class Matrix:
@@ -33,7 +34,8 @@ class Matrix:
             for j in range(self.n):
                 string += str(self.board[i][j]) + " "
             string = string[:len(string) - 1]
-            string += "| \n"
+            string += "|\n"
+        string = string[:len(string) - 1]
         return string
 
     def __eq__(self, other: object) -> bool:
@@ -317,6 +319,7 @@ class Matrix:
             else:
                 self.swap_rows(current_row, leading_one_row)
                 self.scale_row(current_row, 1/self.get_entry(current_row, current_col))
+                self.set_entry(current_row, current_col, int(self.get_entry(current_row, current_col)))
                 for i in range(current_row + 1, self.m):
                     entry = self.get_entry(i, current_col)
                     if entry != 0:
@@ -492,4 +495,12 @@ class Matrix:
 
 
 if __name__ == '__main__':
-    pass
+    for i in range(3):
+        m = Matrix(3, 3)
+        for j in range(3):
+            for k in range(3):
+                m.set_entry(j, k, randint(0, 10))
+        print(m)
+        m.row_reduce()
+        m = m.round(2)
+        print(m)
