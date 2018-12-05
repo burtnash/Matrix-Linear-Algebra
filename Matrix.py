@@ -2,6 +2,7 @@
 
 from typing import Union, List, Tuple
 from random import randint
+from InvalidMatrixException import InvalidMatrixException
 
 
 class Matrix:
@@ -10,10 +11,15 @@ class Matrix:
 
     m: Number of rows.
     n: Number of columns.
-    board: All matrix values.
+    board: mxn board containing the entry values.
     """
 
     def __init__(self, m: int, n: int) -> None:
+        """
+        Initializes a matrix of size m x n filled with 0's.
+        :param m: Number of rows
+        :param n: Number of columns.
+        """
         self.m = m
         self.n = n
         self.board = []
@@ -89,6 +95,16 @@ class Matrix:
             for j in range(self.n):
                 temp_matrix.set_entry(i, j, self.get_entry(i, j))
         return temp_matrix
+
+    def round_floats(self) -> None:
+        """
+        Takes all floats in self with trailing 0's and converts them to ints.
+        """
+        for i in range(self.m):
+            for j in range(self.n):
+                entry = self.get_entry(i, j)
+                if type(entry) == float and entry.is_integer():
+                    self.set_entry(i, j, int(entry))
 
     def round(self, digits: int) -> "Matrix":
         """
@@ -196,7 +212,7 @@ class Matrix:
         :return: A new matrix equal to the sum of self and other.
         """
         if not self.is_equal_size(other):
-            raise Exception
+            raise InvalidMatrixException("These matrices are not the same size.")
         a = Matrix(self.m, self.n)
         for i in range(self.m):
             for j in range(self.n):
@@ -358,8 +374,10 @@ class Matrix:
         :return: The matrix equal to the product of self and other.
         """
 
-        if self.n != other.m:
-            raise Exception
+        if self.n != other.m and self.m != other.n:
+            raise InvalidMatrixException("These matrices are not multipliable.")
+        elif self.n != other.m:
+            raise InvalidMatrixException("These matrices are not multipliable in this order.")
         m = self.m
         n = other.n
         o = self.n
@@ -379,11 +397,11 @@ class Matrix:
         :return: The matrix equal to self multiplied by itself exponent-1 times.
         """
         if exponent < 0:
-            raise Exception("Invalid exponent")
+            raise ValueError("Impossible power")
         elif exponent == 1:
             return self.copy()
         elif not self.is_square():
-            raise Exception("Cannot be raised to power")
+            raise InvalidMatrixException("Cannot be raised to power")
         elif exponent == 0:
             return Matrix.get_i_matrix(self.m)
         temp_matrix = self.copy()
@@ -419,10 +437,10 @@ class Matrix:
         :return: The determinant of self.
         """
         if not self.is_square():
-            raise Exception("Matrix is not square")
+            raise InvalidMatrixException("Matrix is not square")
         size = self.m
         if size == 1:
-            raise Exception("Cannot have determinant for 1x1 matrix")
+            return self.get_entry(0, 0)
         elif size == 2:
             a = self.get_entry(0, 0)
             b = self.get_entry(0, 1)
@@ -442,9 +460,9 @@ class Matrix:
         :return: A 2x2 matrix equal to the inverse of self.
         """
         if self.n != 2 or self.m != 2:
-            raise Exception("Not 2x2")
+            raise InvalidMatrixException("Not 2x2")
         elif not self.is_invertible():
-            raise Exception("Not invertible")
+            raise InvalidMatrixException("Not invertible")
         temp_matrix = self.copy()
         temp_matrix.set_entry(0, 0, self.get_entry(1, 1))
         temp_matrix.board[0][1] *= -1
@@ -461,7 +479,7 @@ class Matrix:
         :return: The matrix equal to the inverse of self.
         """
         if not self.is_invertible():
-            raise Exception
+            raise InvalidMatrixException("Not Invertible")
         size = self.m
         temp_matrix = Matrix(size, 2 * size)
         i_matrix = Matrix.get_i_matrix(size)
@@ -477,8 +495,9 @@ class Matrix:
         for i in range(self.m):
             for j in range(self.n):
                 temp_matrix_2.set_entry(i, j, temp_matrix.get_entry(i, j - size))
-        temp_matrix_3 = temp_matrix_2.round(3)
-        return temp_matrix_3
+        temp_matrix_2 = temp_matrix_2.round(3)
+        temp_matrix_2.round_floats()
+        return temp_matrix_2
 
     def is_eigenvalue(self, eigenvalue: int) -> bool:
         """
@@ -487,7 +506,7 @@ class Matrix:
         :return: Whether or not eigenvalue is an eigenvalue for self.
         """
         if not self.is_square():
-            raise Exception
+            raise InvalidMatrixException("This is not a square matrix")
         i = Matrix.get_i_matrix(self.m)
         i.scale(eigenvalue * -1)
         a = self.add_matrix(i)
@@ -495,12 +514,16 @@ class Matrix:
 
 
 if __name__ == '__main__':
-    for i in range(3):
-        m = Matrix(3, 3)
-        for j in range(3):
-            for k in range(3):
-                m.set_entry(j, k, randint(0, 10))
-        print(m)
-        m.row_reduce()
-        m = m.round(2)
-        print(m)
+    for _ in range(3):
+        A = Matrix(3, 3)
+        for y in range(3):
+            for z in range(3):
+                A.set_entry(y, z, randint(0, 10))
+        print(A)
+        print("")
+        A.row_reduce()
+        A.reduced_row_reduce()
+        A.round_floats()
+        A = A.round(2)
+        print(A)
+        print("")
