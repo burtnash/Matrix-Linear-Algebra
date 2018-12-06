@@ -1,7 +1,6 @@
 """Linear Algebra Matrix"""
 
 from typing import Union, List, Tuple
-from random import randint
 from InvalidMatrixException import InvalidMatrixException
 
 
@@ -33,7 +32,6 @@ class Matrix:
         Returns a string representation of self.
         :return: String representation of self.
         """
-
         string = ""
         for i in range(self.m):
             string += "|"
@@ -42,6 +40,17 @@ class Matrix:
             string = string[:len(string) - 1]
             string += "|\n"
         string = string[:len(string) - 1]
+        return string
+
+    def __repr__(self) -> str:
+        """
+        Return the repr for Matrix self
+        :return: The repr for self.
+        """
+        string = "{}x{}: ".format(self.m, self.n)
+        for i in range(self.m):
+            for j in range(self.n):
+                string += (" {}".format(self.get_entry(i, j)))
         return string
 
     def __eq__(self, other: object) -> bool:
@@ -84,6 +93,17 @@ class Matrix:
         :param board: A list of list of values to be the new board.
         """
         self.board = board
+
+    def set_entries(self, board: List[int]) -> None:
+        """
+        Sets the board entries to those in board, first filling rows then columns
+        Precondition, len(board) == m * n
+        :param board: List of values left to right, top to bottom.
+        """
+        if len(board) != self.m * self.n:
+            raise ValueError("Board is not appropraite length.")
+        for i in range(len(board)):
+            self.set_entry(i // self.n, i % self.n, board[i])
 
     def copy(self) -> "Matrix":
         """
@@ -514,16 +534,4 @@ class Matrix:
 
 
 if __name__ == '__main__':
-    for _ in range(3):
-        A = Matrix(3, 3)
-        for y in range(3):
-            for z in range(3):
-                A.set_entry(y, z, randint(0, 10))
-        print(A)
-        print("")
-        A.row_reduce()
-        A.reduced_row_reduce()
-        A.round_floats()
-        A = A.round(2)
-        print(A)
-        print("")
+    pass
