@@ -2,6 +2,8 @@
 
 from Matrix import Matrix
 from typing import List, Union
+from InvalidMatrixException import InvalidMatrixException
+
 
 class AugmentedMatrix(Matrix):
     """
@@ -47,9 +49,10 @@ class AugmentedMatrix(Matrix):
         for i in range(len(row)-1):
             if row[i] != 0:
                 return False
-        return row[-1] == 0
+        # row[0:-1] are all zeroes
+        return row[-1] != 0
 
-    def is_valid_solution(self) -> bool:
+    def exists_valid_solution(self) -> bool:
         """
         Returns true if self is a valid augmented matrix with proper solutions.
         :return: Whether self is valid.
@@ -58,5 +61,22 @@ class AugmentedMatrix(Matrix):
         ag.row_reduce()
         for row in ag.board:
             if AugmentedMatrix.is_invalid_row(row):
+                return False
+        return True
+
+    def is_valid_solution(self, solutions: List[Union[int, float]]) -> bool:
+        """
+        Returns true if solutions are valid solutions to augmented matrix self.
+        Precondition: len(solutions) == self.n-1
+        :param solutions: The solutions in proper order.
+        :return: Whether solutions are valid solutions.
+        """
+        if len(solutions) != self.n-1:
+            raise InvalidMatrixException("There are not the right number of solutions for this matrix")
+        for row in self.board:
+            val = 0
+            for i in range(self.n-1):
+                val += row[i] * solutions[i]
+            if val != row[-1]:
                 return False
         return True
