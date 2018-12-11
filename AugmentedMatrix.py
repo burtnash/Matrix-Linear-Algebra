@@ -80,3 +80,13 @@ class AugmentedMatrix(Matrix):
             if val != row[-1]:
                 return False
         return True
+
+    # TODO: fix this, it is wrong
+    def has_unique_solution(self) -> bool:
+        """
+        Returns true if self has a unique solution.
+        :return: Whether self has a unique solution.
+        """
+        if not self.exists_valid_solution():
+            return False
+        return self.rank() == self.m == self.n

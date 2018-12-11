@@ -13,11 +13,13 @@ class Matrix:
     board: mxn board containing the entry values.
     """
 
-    def __init__(self, m: int, n: int) -> None:
+    def __init__(self, m: int, n: int, board: Union[List[Union[int, float]], None]=None) -> None:
         """
         Initializes a matrix of size m x n filled with 0's.
+        Precondition: len(board) = m * n
         :param m: Number of rows
         :param n: Number of columns.
+        :param board: A list of values to be put in left to right, top to bottom.
         """
         self.m = m
         self.n = n
@@ -26,6 +28,8 @@ class Matrix:
             self.board.append([])
             for _ in range(n):
                 self.board[i].append(0)
+        if board is not None:
+            self.set_entries(board)
 
     def __str__(self) -> str:
         """
@@ -215,6 +219,19 @@ class Matrix:
         :return: Whether or not self and other have equal size
         """
         return self.m == other.m and self.n == other.n
+
+    def rank(self) -> int:
+        """
+        Returns the rank of self.
+        :return: Rank of self.
+        """
+        temp_matrix = self.copy()
+        temp_matrix.row_reduce()
+        ret = self.m
+        for row in temp_matrix.board:
+            if Matrix.is_zero_row(row):
+                ret -= 1
+        return ret
 
     def scale(self, scalar: float) -> None:
         """
@@ -534,4 +551,5 @@ class Matrix:
 
 
 if __name__ == '__main__':
-    pass
+    m = Matrix(2, 2, [1, 1, 1, -1])
+    print(m.inverse_size_2())

@@ -1,4 +1,3 @@
 Features to add:
 
-Diagonalization
-Eigenvectors and eigenvalues
+Make matrix implement rational numbers to avoid shitty situations with float.

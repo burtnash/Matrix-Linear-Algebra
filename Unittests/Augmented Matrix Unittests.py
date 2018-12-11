@@ -44,6 +44,21 @@ class TestAugmentedMatrix(unittest.TestCase):
         m.set_entries([1, 1, 0, 0, 3, 1, 0, 2, -1, 2])
         self.assertFalse(m.is_valid_solution([1, 2, 3, 4]))
 
+    # Exists unique solutions test
+    def test_unique_solution(self):
+        m = AugmentedMatrix(2, 3)
+        m.set_entries([1, 0, 1, 0, 1, 1])
+        b = m.has_unique_solution()
+        self.assertTrue(m.has_unique_solution())
+
+    def test_unique_solution_2(self):
+        m = AugmentedMatrix(5, 5)
+        m.set_entries([1, 0, 1, 0, 1, 1])
+        b = m.has_unique_solution()
+        self.assertTrue(m.has_unique_solution())
+
+
+
 
 if __name__ == "__main__":
     unittest.main()
