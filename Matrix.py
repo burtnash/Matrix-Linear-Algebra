@@ -1,6 +1,7 @@
 """Linear Algebra Matrix"""
 
 from typing import Union, List, Tuple
+from Rational import Rational
 from InvalidMatrixException import InvalidMatrixException
 
 
@@ -13,7 +14,7 @@ class Matrix:
     board: mxn board containing the entry values.
     """
 
-    def __init__(self, m: int, n: int, board: Union[List[Union[int, float]], None]=None) -> None:
+    def __init__(self, m: int, n: int, board: Union[List[Union[int, Rational]], None] = None) -> None:
         """
         Initializes a matrix of size m x n filled with 0's.
         Precondition: len(board) = m * n
@@ -51,7 +52,7 @@ class Matrix:
         Return the repr for Matrix self
         :return: The repr for self.
         """
-        string = "{}x{}: ".format(self.m, self.n)
+        string = "{}x{}:".format(self.m, self.n)
         for i in range(self.m):
             for j in range(self.n):
                 string += (" {}".format(self.get_entry(i, j)))
@@ -74,7 +75,7 @@ class Matrix:
                     return False
         return True
 
-    def set_entry(self, row: int, col: int, value: int) -> None:
+    def set_entry(self, row: int, col: int, value: Union[int, Rational]) -> None:
         """
         Sets the entry and row row and column col to value.
         :param row: The row of the value being set.
@@ -83,7 +84,7 @@ class Matrix:
         """
         self.board[row][col] = value
 
-    def get_entry(self, row: int, col: int) -> Union[int, float]:
+    def get_entry(self, row: int, col: int) -> Union[int, Rational]:
         """
         Returns the value at row i and col j.
         :param row: The row of the value being retrieved.
@@ -91,7 +92,7 @@ class Matrix:
         """
         return self.board[row][col]
 
-    def set_board(self, board: List[List[Union[int, float]]]) -> None:
+    def set_board(self, board: List[List[Union[int, Rational]]]) -> None:
         """
         Sets the board to board, where the lists of board are the rows of the matrix.
         :param board: A list of list of values to be the new board.
@@ -120,27 +121,26 @@ class Matrix:
                 temp_matrix.set_entry(i, j, self.get_entry(i, j))
         return temp_matrix
 
-    def round_floats(self) -> None:
+    def int_to_rat(self) -> None:
         """
-        Takes all floats in self with trailing 0's and converts them to ints.
+        Converts all integer entries to rationals.
         """
         for i in range(self.m):
             for j in range(self.n):
                 entry = self.get_entry(i, j)
-                if type(entry) == float and entry.is_integer():
-                    self.set_entry(i, j, int(entry))
+                if type(entry) == int:
+                    self.set_entry(i, j, Rational(entry))
 
-    def round(self, digits: int) -> "Matrix":
+    def rat_to_int(self) -> None:
         """
-        Returns self with all entries rounded to digits decimal places.
-        :param digits: The number of decimal places rounded to.
-        :return: Matrix equivalent to self with each entry rounded.
+        Converts all rational entries to ints if no information is lost.
         """
-        temp_matrix = Matrix(self.m, self.n)
         for i in range(self.m):
             for j in range(self.n):
-                temp_matrix.set_entry(i, j, round(self.get_entry(i, j), digits))
-        return temp_matrix
+                entry = self.get_entry(i, j)
+                if type(entry) == Rational:
+                    if entry.is_integer():
+                        self.set_entry(i, j, int(entry))
 
     @staticmethod
     def is_zero_row(row: List[Union[int, float]]) -> bool:
@@ -242,7 +242,7 @@ class Matrix:
             for j in range(self.n):
                 self.board[i][j] *= scalar
 
-    def add_matrix(self, other: "Matrix") -> "Matrix":
+    def __add__(self, other: "Matrix") -> "Matrix":
         """
         Returns matrix equivalent to self + other
         :param other: The second matrix being added.
@@ -356,6 +356,7 @@ class Matrix:
         """
         Row reduces self by gaussian elimination.
         """
+        self.int_to_rat()
         current_row = 0
         current_col = 0
         while not self.in_row_echelon_form():
@@ -376,22 +377,24 @@ class Matrix:
                 for i in range(current_row + 1, self.m):
                     entry = self.get_entry(i, current_col)
                     if entry != 0:
-                        self.add_scaled_row(i, current_row, -entry)
+                        self.add_scaled_row(i, current_row, -1 * entry)
                 current_row += 1
                 current_col += 1
+        self.rat_to_int()
 
     def reduced_row_reduce(self) -> None:
         """
         Row reduces self to RREF.
         Precondition: self is in ref.
         """
+        self.int_to_rat()
         leading_ones = self.get_leading_ones()
         leading_ones.reverse()
         for leader in leading_ones:
             for i in range(leader[0] - 1, -1, -1):
                 entry = self.get_entry(i, leader[1])
                 if entry != 0:
-                    self.add_scaled_row(i, leader[0], -entry)
+                    self.add_scaled_row(i, leader[0], -1 * entry)
 
     def transpose(self) -> "Matrix":
         """
@@ -404,7 +407,7 @@ class Matrix:
                 temp_matrix.set_entry(j, i, self.get_entry(i, j))
         return temp_matrix
 
-    def multiply(self, other: "Matrix") -> "Matrix":
+    def __mul__(self, other: "Matrix") -> "Matrix":
         """
         Returns the product of self and other together.
         :param other: The right matrix being multiplied.
@@ -444,7 +447,7 @@ class Matrix:
         temp_matrix = self.copy()
         temp_matrix2 = self.copy()
         for _ in range(exponent - 1):
-            temp_matrix2 = temp_matrix.multiply(temp_matrix2)
+            temp_matrix2 = temp_matrix * temp_matrix2
         return temp_matrix2
 
     def matrix_sub_two(self, row: int, col: int) -> "Matrix":
@@ -532,8 +535,6 @@ class Matrix:
         for i in range(self.m):
             for j in range(self.n):
                 temp_matrix_2.set_entry(i, j, temp_matrix.get_entry(i, j - size))
-        temp_matrix_2 = temp_matrix_2.round(3)
-        temp_matrix_2.round_floats()
         return temp_matrix_2
 
     def is_eigenvalue(self, eigenvalue: int) -> bool:
@@ -551,5 +552,6 @@ class Matrix:
 
 
 if __name__ == '__main__':
-    m = Matrix(2, 2, [1, 1, 1, -1])
-    print(m.inverse_size_2())
+    m = Matrix(3, 3, [2, 2, 3, 4, 6, 2, 3, 4, 4])
+    m.row_reduce()
+    print(m)

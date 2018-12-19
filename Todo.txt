@@ -1,3 +1,5 @@
 Features to add:
 
-Make matrix implement rational numbers to avoid shitty situations with float.
+//Make matrix implement rational numbers to avoid shitty situations with float.
+Reformat matrix to use built in __mul__ etc.
+Add more unittests.
