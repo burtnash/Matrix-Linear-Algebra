@@ -3,6 +3,7 @@
 from Matrix import Matrix
 from typing import List, Union
 from InvalidMatrixException import InvalidMatrixException
+from Rational import Rational
 
 
 class AugmentedMatrix(Matrix):
@@ -38,6 +39,26 @@ class AugmentedMatrix(Matrix):
             string += "|\n"
         string = string[:len(string) - 1]
         return string
+
+    def set_coefficients(self, coefficients: List[List[Union[int, Rational]]]) -> None:
+        """
+        Sets the coefficients of the augmemted matrix.
+        Precondition: len(coefficients) = num rows
+        Precondition: len(coefficients[i]) = num cols - 1
+        :param coefficients: The coefficients, as a list of the rows.
+        """
+        for i in range(len(coefficients)):
+            for j in range(len(coefficients[i])):
+                self.set_entry(i, j, coefficients[i][j])
+
+    def set_solutions(self, solutions: List[Union[int, Rational]]) -> None:
+        """
+        Sets the solutions of the augmemted matrix.
+        Precondition: len(solutions) = num rows
+        :param solutions: The solutions from top to bottom
+        """
+        for i in range(len(solutions)):
+            self.set_entry(i, self.n-1, solutions[i])
 
     @staticmethod
     def is_invalid_row(row: List[Union[int, float]]) -> bool:
@@ -89,4 +110,4 @@ class AugmentedMatrix(Matrix):
         """
         if not self.exists_valid_solution():
             return False
-        return self.rank() == self.m == self.n
+        return self.rank() == self.m == self.n - 1

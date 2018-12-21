@@ -4,6 +4,7 @@ Unittests for the matrix class.
 
 import unittest
 from Matrix import Matrix
+from Rational import Rational
 
 
 class TestMatrix(unittest.TestCase):
@@ -99,6 +100,12 @@ class TestMatrix(unittest.TestCase):
         m.set_entries([2, 1, 3, 7, 0, 1, 1, 0, -1, 4, 0, 3])
         self.assertFalse(m.in_row_echelon_form())
 
+    def test_is_ref_2x4(self):
+        m = Matrix(2, 4)
+        m.set_entries([1, Rational(5, 4), Rational(1, 4), 0, 0, Rational(1, 2), Rational(-1, 2), 1])
+        m.in_row_echelon_form()
+        self.assertFalse(m.in_row_echelon_form())
+
     # In Reduced REF tests
     def test_is_rref(self):
         m = Matrix(3, 3)
@@ -163,6 +170,28 @@ class TestMatrix(unittest.TestCase):
         m.row_reduce()
         m.reduced_row_reduce()
         self.assertTrue(m.in_reduced_ref())
+
+    # Inverse Tests
+    def test_2x2_i_matrix(self):
+        m = Matrix.get_i_matrix(2)
+        self.assertEqual(m, m.inverse())
+
+    def test_2x2_matrix(self):
+        m = Matrix(2, 2, [1, 2, 3, 4])
+        self.assertEqual(m * m.inverse(), Matrix.get_i_matrix(2))
+
+    def test_2x2_matrix_2(self):
+        m = Matrix(2, 2, [4, 5, 2, 3])
+        n = Matrix(2, 2, [Rational(3, 2), Rational(-5, 2), -1, 2])
+        self.assertEqual(m.inverse() * m, Matrix.get_i_matrix(2))
+
+    def test_3x3_i_matrix(self):
+        m = Matrix.get_i_matrix(3)
+        self.assertEqual(m, m.inverse())
+
+    def test_3x3_matrix(self):
+        m = Matrix(3, 3, [1, 2, 4, 2, 3, 6, 4, 3, 1])
+        self.assertEqual(m * m.inverse(), Matrix.get_i_matrix(3))
 
 
 if __name__ == "__main__":

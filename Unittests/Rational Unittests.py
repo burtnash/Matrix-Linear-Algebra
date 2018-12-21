@@ -26,6 +26,9 @@ class TestRational(unittest.TestCase):
     def test_not_eq(self):
         self.assertNotEqual(Rational(1, 2), Rational(2, 2))
 
+    def test_not_eq_rat_int(self):
+        self.assertFalse(Rational(1, 2) == 1)
+
     def test_add_rational_1(self):
         self.assertEqual(Rational(4, 5) + Rational(8, 10), Rational(8, 5))
 

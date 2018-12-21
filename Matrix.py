@@ -3,6 +3,7 @@
 from typing import Union, List, Tuple
 from Rational import Rational
 from InvalidMatrixException import InvalidMatrixException
+from random import randint
 
 
 class Matrix:
@@ -395,6 +396,7 @@ class Matrix:
                 entry = self.get_entry(i, leader[1])
                 if entry != 0:
                     self.add_scaled_row(i, leader[0], -1 * entry)
+        self.rat_to_int()
 
     def transpose(self) -> "Matrix":
         """
@@ -428,9 +430,10 @@ class Matrix:
                 for k in range(o):
                     num += self.get_entry(i, k) * other.get_entry(k, j)
                 temp_matrix.set_entry(i, j, num)
+        temp_matrix.rat_to_int()
         return temp_matrix
 
-    def power(self, exponent: int) -> "Matrix":
+    def __pow__(self, exponent: int) -> "Matrix":
         """
         Returns matrix equivalent to self multiplied by itself exponent times.
         :param exponent: The exponent that self is raised to.
@@ -441,7 +444,7 @@ class Matrix:
         elif exponent == 1:
             return self.copy()
         elif not self.is_square():
-            raise InvalidMatrixException("Cannot be raised to power")
+            raise InvalidMatrixException("Matrix is not square")
         elif exponent == 0:
             return Matrix.get_i_matrix(self.m)
         temp_matrix = self.copy()
@@ -547,11 +550,15 @@ class Matrix:
             raise InvalidMatrixException("This is not a square matrix")
         i = Matrix.get_i_matrix(self.m)
         i.scale(eigenvalue * -1)
-        a = self.add_matrix(i)
+        a = self + i
         return a.determinant() == 0
 
 
 if __name__ == '__main__':
-    m = Matrix(3, 3, [2, 2, 3, 4, 6, 2, 3, 4, 4])
+    l = []
+    for i in range(4):
+        for j in range(4):
+            l.append(randint(0, 10))
+    m = Matrix(4, 4, l)
     m.row_reduce()
     print(m)

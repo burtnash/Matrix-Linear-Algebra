@@ -30,7 +30,7 @@ class Rational:
         :return: Whether self and other are equal.
         """
         if type(other) == int:
-            return self.simplify().get_numerator() == other
+            return self.simplify().get_numerator() == other and self.get_denominator() == 1
         elif type(self) != type(other):
             return False
         return self.simplify().p == other.simplify().p and self.simplify().q == other.simplify().q
@@ -237,7 +237,8 @@ class Rational:
 
     def scale(self, scalar: int) -> "Rational":
         """
-        Returns scaled self but does not change underlying value. Ie, self = self.scale(m) for all m.
+        Returns scaled self but does not change underlying value.
+        Postcondition: self = self.scale(m) for all m.
         :return: Scaled version of self.
         """
         return Rational(self.p * scalar, self.q * scalar)
