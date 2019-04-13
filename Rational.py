@@ -5,24 +5,31 @@ from typing import Union
 
 class Rational:
     """
-    A number that can be represented as a fraction of two integers.
+    A number that can be represented as a ratio of two integers.
     This type is immutable.
 
     p: The numberator
     q: The denominator
     """
 
-    def __init__(self, num: int, denom: int = 1) -> None:
+    def __init__(self, num: Union[int, float], denom: Union[int, float] = 1) -> None:
         """
         Initializes a new rational number
-        Precondition: num and denom must be ints, denom can't be zero
+        Precondition: num and denom must be ints or floats, denom can't be zero.
         :param num: The numberator
         :param denom: The denominator, defaults to one.
         """
         if denom == 0:
             raise ZeroDivisionError("Cannot have rational with zero denominator.")
-        self.p = num
-        self.q = denom
+        if isinstance(num, int) and isinstance(denom, int):
+            self.p = num
+            self.q = denom
+        else:
+            num = int(num * 10 ** 10)
+            denom = int(denom * 10 ** 10)
+            temp = Rational(num, denom).simplify()
+            self.p = temp.get_numerator()
+            self.q = temp.get_denominator()
 
     def __eq__(self, other) -> bool:
         """

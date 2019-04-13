@@ -13,7 +13,7 @@ class AugmentedMatrix(Matrix):
     board: mxn board containing the entry values.
     """
 
-    def __init__(self, m: int, n: int):
+    def __init__(self, m: int, n: int, board: Union[List[Union[int, Rational]], None] = None):
         """
         Initializes a matrix of size m x n filled with 0's.
         :param m: Number of rows
@@ -21,7 +21,7 @@ class AugmentedMatrix(Matrix):
         """
         if n < 2:
             raise InvalidMatrixException("Not a valid augmented matrix")
-        super().__init__(m, n)
+        super().__init__(m, n, board)
 
     def __str__(self) -> str:
         """
@@ -51,9 +51,9 @@ class AugmentedMatrix(Matrix):
             for j in range(len(coefficients[i])):
                 self.set_entry(i, j, coefficients[i][j])
 
-    def set_solutions(self, solutions: List[Union[int, Rational]]) -> None:
+    def set_constants(self, solutions: List[Union[int, Rational]]) -> None:
         """
-        Sets the solutions of the augmemted matrix.
+        Sets the constants of the augmemted matrix.
         Precondition: len(solutions) = num rows
         :param solutions: The solutions from top to bottom
         """
@@ -102,7 +102,6 @@ class AugmentedMatrix(Matrix):
                 return False
         return True
 
-    # TODO: fix this, it is wrong
     def has_unique_solution(self) -> bool:
         """
         Returns true if self has a unique solution.
@@ -110,4 +109,28 @@ class AugmentedMatrix(Matrix):
         """
         if not self.exists_valid_solution():
             return False
-        return self.rank() == self.m == self.n - 1
+        return self.rank() == self.n - 1
+
+    def get_unique_solutions(self):
+        """
+        Returns a list of the solutions of self.
+        :return:
+        """
+        if not self.has_unique_solution():
+            raise InvalidMatrixException("This matrix has more than one unique solution")
+        rows = []
+        for i in range(self.m):
+            rows.append(self.board[i])
+        solutions = [0 for _ in range(self.n-1)]
+        rows.reverse()
+        for row in rows:
+            constants = row[-1]
+            coefficients = row[:-1]
+            print(coefficients)
+            print(solutions)
+
+
+
+if __name__ == '__main__':
+    ag = AugmentedMatrix(2, 3, [1, 1, 2, 0, 1, 1])
+    ag.get_unique_solutions()

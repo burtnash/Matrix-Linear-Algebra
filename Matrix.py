@@ -274,22 +274,22 @@ class Matrix:
         for i in range(self.n):
             self.board[row][i] *= scalar
 
-    def add_scaled_row(self, base_row: int, adder_row: int, scalar: float) -> None:
+    def add_scaled_row(self, base_row: int, added_row: int, scalar: float) -> None:
         """
-        Adds row2's values to row1 where each value is scaled by scalar.
+        Adds adder_row's values to base_row where each value is scaled by scalar.
         :param base_row: The row being added onto.
-        :param adder_row: The row being scaled and added to base_row.
+        :param added_row: The row being scaled and added to base_row.
         :param scalar: The amount that adder_row is scaled by.
         """
         temp_row = []
-        for num in self.board[adder_row]:
+        for num in self.board[added_row]:
             temp_row.append(num * scalar)
         for i in range(len(self.board[base_row])):
             self.board[base_row][i] += temp_row[i]
 
     def get_leading_ones(self) -> List[Tuple[int, int]]:
         """
-        Returns a list of the coordinated of all the leading ones.
+        Returns a list of the coordinates as tuples of all the leading ones.
         Precondition: self is in ref.
         :return: List of leading one coordinates in the form (row, col).
         """
@@ -400,7 +400,7 @@ class Matrix:
 
     def transpose(self) -> "Matrix":
         """
-        Returns the transpose of self.
+        Returns the matrix equal to transpose of self.
         :return: The transpose of self.
         """
         temp_matrix = Matrix(self.n, self.m)
@@ -496,25 +496,6 @@ class Matrix:
                 det += (-1) ** j * self.get_entry(0, j) * self.matrix_sub_two(0, j).determinant()
             return det
 
-    def inverse_size_2(self) -> "Matrix":
-        """
-        Returns a matrix equal to the inverse of self if self is 2x2 and invertible.
-        Precondition: Self is 2x2 and invertible.
-        :return: A 2x2 matrix equal to the inverse of self.
-        """
-        if self.n != 2 or self.m != 2:
-            raise InvalidMatrixException("Not 2x2")
-        elif not self.is_invertible():
-            raise InvalidMatrixException("Not invertible")
-        temp_matrix = self.copy()
-        temp_matrix.set_entry(0, 0, self.get_entry(1, 1))
-        temp_matrix.board[0][1] *= -1
-        temp_matrix.board[1][0] *= -1
-        temp_matrix.set_entry(1, 1, self.get_entry(0, 0))
-        scalar = 1 / temp_matrix.determinant()
-        temp_matrix.scale(scalar)
-        return temp_matrix
-
     def inverse(self) -> "Matrix":
         """
         Returns the inverse of self.
@@ -555,10 +536,25 @@ class Matrix:
 
 
 if __name__ == '__main__':
-    l = []
-    for i in range(4):
-        for j in range(4):
-            l.append(randint(0, 10))
-    m = Matrix(4, 4, l)
-    m.row_reduce()
-    print(m)
+    matrix_m = int(input("How many rows: "))
+    matrix_n = int(input("How many columns: "))
+    entries = []
+    for i in range(matrix_m):
+        for j in range(matrix_n):
+            message = "The {} {} entry is: ".format(i, j)
+            entry = int(input(message))
+            entries.append(entry)
+    m = Matrix(matrix_m, matrix_n, entries)
+    print("What would you like to do: 1: Row reduction, 2: Reduced row reduction, 3: determinant, 4: inverse")
+    command = int(input())
+    if command == 4:
+        print(m.inverse())
+    elif command == 1:
+        m.row_reduce()
+        print(m)
+    elif command == 2:
+        m.row_reduce()
+        m.reduced_row_reduce()
+        print(m)
+    elif command == 3:
+        print(m.determinant())

@@ -23,11 +23,20 @@ class TestRational(unittest.TestCase):
     def test_eq_equivalent(self):
         self.assertEqual(Rational(4, 5), Rational(8, 10))
 
-    def test_not_eq(self):
+    def test_ne(self):
         self.assertNotEqual(Rational(1, 2), Rational(2, 2))
 
-    def test_not_eq_rat_int(self):
-        self.assertFalse(Rational(1, 2) == 1)
+    def test_ne_rat_int(self):
+        self.assertNotEqual(Rational(1, 2), 1)
+
+    def test_req_int_rat(self):
+        self.assertTrue(1, Rational(3, 3))
+
+    def test_gt(self):
+        self.assertGreater(Rational(3, 2), Rational(5, 4))
+
+    def test_ge(self):
+        self.assertGreaterEqual(Rational(3, 3), Rational(2, 2))
 
     def test_add_rational_1(self):
         self.assertEqual(Rational(4, 5) + Rational(8, 10), Rational(8, 5))
@@ -57,10 +66,10 @@ class TestRational(unittest.TestCase):
         self.assertEqual(Rational(2, 3) * Rational(3, 4), Rational(1, 2))
 
     def test_rmul(self):
-        self.assertEqual((3 * Rational(1, 3)), 1)
+        self.assertEqual(3 * Rational(1, 3), 1)
 
     def test_rtruediv(self):
-        self.assertEqual(2 / Rational(1, 3), Rational(6, 1))
+        self.assertEqual(2 / Rational(1, 3), 6)
 
 
 if __name__ == "__main__":
